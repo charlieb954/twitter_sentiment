@@ -17,10 +17,10 @@ class TwitterAPI:
     '''
     DOCS = 'https://dev.twitter.com/rest/reference/get/search/tweets'
 
-    __token = ''
-    __token_secret = ''
-    __consumer_key = ''
-    __consumer_secret = ''
+    _token = ''
+    _token_secret = ''
+    _consumer_key = ''
+    _consumer_secret = ''
     
     resp = ''
     results_df = pd.DataFrame()
@@ -39,21 +39,21 @@ class TwitterAPI:
     def check_tokens(self):
         '''check each of the 4 required tokens are more than 10 in length, request input if not.
         tokens can be requested using a Twitter developers account'''
-        while not self.__token or len(self.__token) < 10 or self.__token == 'exit':
-            self.__token = input('Please enter a token, type exit to quit: ')
-            if self.__token == 'exit':
+        while not self._token or len(self._token) < 10 or self._token == 'exit':
+            self._token = input('Please enter a token, type exit to quit: ')
+            if self._token == 'exit':
                 break
-        while not self.__token_secret or len(self.__token_secret) < 10 or self.__token_secret == 'exit':
-            self.__token_secret = input('Please enter a token secret: ')
-            if self.__token_secret == 'exit':
+        while not self._token_secret or len(self._token_secret) < 10 or self._token_secret == 'exit':
+            self._token_secret = input('Please enter a token secret: ')
+            if self._token_secret == 'exit':
                 break
-        while not self.__consumer_key or len(self.__consumer_key) < 10 or self.__consumer_key == 'exit':
-            self.__consumer_key = input('Please enter a consumer key: ')
-            if self.__consumer_key == 'exit':
+        while not self._consumer_key or len(self._consumer_key) < 10 or self._consumer_key == 'exit':
+            self._consumer_key = input('Please enter a consumer key: ')
+            if self._consumer_key == 'exit':
                 break
-        while not self.__consumer_secret or len(self.__consumer_secret) < 10 or self.__consumer_secret == 'exit':
-            self.__consumer_secret = input('Please enter a consumer secret: ')
-            if self.__consumer_secret == 'exit':
+        while not self._consumer_secret or len(self._consumer_secret) < 10 or self._consumer_secret == 'exit':
+            self._consumer_secret = input('Please enter a consumer secret: ')
+            if self._consumer_secret == 'exit':
                 break
 
     def check_query(self, query, count):
@@ -82,10 +82,10 @@ class TwitterAPI:
         
         self.check_query(query, count)
         
-        t = twitter.Twitter(auth=twitter.OAuth(self.__token, 
-                                       self.__token_secret, 
-                                       self.__consumer_key, 
-                                       self.__consumer_secret)
+        t = twitter.Twitter(auth=twitter.OAuth(self._token, 
+                                       self._token_secret, 
+                                       self._consumer_key, 
+                                       self._consumer_secret)
                                        )
 
         self.resp = t.search.tweets(q= query, 
@@ -99,10 +99,10 @@ class TwitterAPI:
 
         self.check_query(query, count)
         
-        t = twitter.Twitter(auth = twitter.OAuth(self.__token, 
-                                                self.__token_secret, 
-                                                self.__consumer_key, 
-                                                self.__consumer_secret)
+        t = twitter.Twitter(auth = twitter.OAuth(self._token, 
+                                                self._token_secret, 
+                                                self._consumer_key, 
+                                                self._consumer_secret)
                                                 )
 
         self.resp = t.search.tweets(q = query, 
