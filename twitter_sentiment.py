@@ -14,15 +14,33 @@ import re, string, random
 
 class TwitterSentiment:
     def __init__(self, lang = 'english'):
-        '''build stopwords and punctuation list, set default trained model and accuracy.
-        lang = english, check corpus for other available languages'''
+        '''
+        Build stopword lists, set train_model flag and accuracy.
+        
+        Parameters
+        ==========
+        lang = str: check corpus for available languages
+        
+        Returns
+        =======
+        None
+        '''
         self._stopwords = set(stopwords.words(lang) + list(string.punctuation))
         self.trained_model = None
         self.model_accuracy = 0
         
     def make_predictions(self, tweet):
-        '''trains the model if untrained, cleans and processes the tweets, scores each tweet.
-        tweet = [list of tweets to classify]'''
+        '''
+        Calls function to train model if required, cleans and processes the tweets, scores each tweet.
+        
+        Parameters
+        ==========
+        tweet = list: tweets to classify
+        
+        Returns
+        =======
+        results = list: classified tweets
+        '''
         if not self.trained_model:
             self._train_model()
         
@@ -44,7 +62,17 @@ class TwitterSentiment:
             return results
         
     def _train_model(self):
-        '''train the classification model using twitter_samples from the nltk.corpus'''
+        '''
+        Trains the classification model using twitter_samples from nltk.corpus.
+        
+        Parameters
+        ==========
+        None
+        
+        Returns
+        =======
+        None
+        '''
         positive_tweets = twitter_samples.strings('positive_tweets.json')
         negative_tweets = twitter_samples.strings('negative_tweets.json')
         
@@ -76,8 +104,18 @@ class TwitterSentiment:
         self.model_accuracy = classify.accuracy(self.trained_model, test_data)
     
     def process_tweets(self, tweets):
-        '''process tweets, convert to list if required, call functions to clean and lemmatise.
-        tweets = list of tweets to process'''
+        '''
+        Process tweets, converting to list if required.
+        Cleans tweets and lemmatises them.
+        
+        Parameters
+        ==========
+        tweets = list: tweets to process
+        
+        Returns
+        =======
+        token_tweets = list: tokenized tweets
+        '''
         if not type(tweets) == list:
             try:
                 tweets = [tweets]
@@ -91,9 +129,17 @@ class TwitterSentiment:
         return token_tweets
         
     def _clean_tweets(self, tweets):
-        '''TODO, can this regex be better? 
-        remove URLs and AT_USERs and return the tweets
-        tweets = list of tweets to clean'''
+        '''
+        Remove URLs and @users using regex and return the tweets.
+        
+        Parameters
+        ==========
+        tweets = list: tweets to process
+        
+        Returns
+        =======
+        processed_tweets = list: tweets with tags removed
+        '''
         processed_tweets = []
         
         for tweet in tweets:
@@ -106,8 +152,17 @@ class TwitterSentiment:
         return processed_tweets
 
     def _lemmatise_tweets(self, processed_tweets):
-        '''lemmatise the tweets (return the root word), tokenize the tweets
-        processed_tweets = list of cleaned tweets'''
+        '''
+        Process a list of tweets for lemmatising (return the root word).
+        
+        Parameters
+        ==========
+        processed_tweets = list: tweets with tags removed
+        
+        Returns
+        =======
+        lem_tweets = list: list of lemmatised tweets.
+        '''
         lemm_tweets = []
                 
         for tweet in processed_tweets:
@@ -117,8 +172,18 @@ class TwitterSentiment:
         return lemm_tweets
     
     def _lemm_tweet(self, tweet):
-        '''tag as noun verb or adjective and then lemmatise the word to get the root word for easy comparison
-        tweet = a single tweet to lemmatise'''
+        '''
+        Lemmatise the tweets (return the root word), tokenize the tweets.
+        Tag as noun verb or adjective and then lemmatise the word to get the root word for easy comparison.
+        
+        Parameters
+        ==========
+        tweet = str: single tweet with tags removed
+        
+        Returns
+        =======
+        lem_tweets = list: lemmatised tweet.
+        '''
         lemmatizer = WordNetLemmatizer()                    
         lemmatized_sentence = []
         
