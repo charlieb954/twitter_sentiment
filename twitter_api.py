@@ -8,12 +8,8 @@ import csv
 # pip install -r requirements.txt
 
 class TwitterAPI:
-    '''create an instance of TwitterAPI passing credentials if they have not been hard coded.
-    issue_simple_query = required params query string and count of tweets
-    issue_geo_query = required params query string, optional lat lon and max range
-    parse_statuses = optional param columns.
-    parse_metadata = outputs a str with a summary of the metadata
-    output_results = outputs parsed statuses in Excel
+    '''
+    Create an instance of TwitterAPI passing credentials if they have not been hard coded.
     '''
     DOCS = 'https://dev.twitter.com/rest/reference/get/search/tweets'
 
@@ -26,19 +22,32 @@ class TwitterAPI:
     results_df = pd.DataFrame()
 
     def __init__(self):
-        '''check tokens are available for querying the API. if not, request them'''
         self.check_tokens()
 
     def __repr__(self):
-        '''function to decide what is returned when the class is printed'''
+        '''
+        Return a statement specifying if a query has been issued.
+        '''
         if self.resp:
             return f'a query has been issued and is stored in the instance of this class'
         else:
             return f'issue a query to hit the TwitterAPI.'
 
     def check_tokens(self):
-        '''check each of the 4 required tokens are more than 10 in length, request input if not.
-        tokens can be requested using a Twitter developers account'''
+        '''
+        Check the 4 tokens meet the complexity requirements else request input.
+        New tokens can be requested using a Twitter developers account.
+        
+        Parameters
+        ==========
+        query = str: twitter search term 
+        count = int: number of twitter results, maximum is 100
+        
+        Returns
+        =======
+        None - if parameters meet requirements
+        AssertionError - if parameters do not meet requirements
+        '''
         while not self._token or len(self._token) < 10 or self._token == 'exit':
             self._token = input('Please enter a token, type exit to quit: ')
             if self._token == 'exit':
@@ -57,11 +66,35 @@ class TwitterAPI:
                 break
 
     def check_query(self, query, count):
-        '''check query is not blank and count is within range 0 to 100'''
+        '''
+        Check query is not blank and count is within range 0 to 100.
+        
+        Parameters
+        ==========
+        query = str: twitter search term 
+        count = int: number of twitter results, maximum is 100
+        
+        Returns
+        =======
+        None - if parameters meet requirements
+        AssertionError - if parameters do not meet requirements
+        '''
         assert query != '', 'Please ensure you have entered a query term'
         assert count > 0 and count <= 100, 'Minimum number of results is 0 and maximum number of results is 100'
 
     def get_columns(self):
+        '''
+        Get a list of the available columns from the Twitter api response.
+        
+        Parameters
+        ==========
+        None
+        
+        Returns
+        =======
+        set: top level columns 
+        set: second level columns
+        '''
         top_level = [key for key in self.resp.keys()]
         second_level = list()
 
@@ -77,9 +110,18 @@ class TwitterAPI:
         return set(top_level), set(second_level)
 
     def issue_simple_query(self, query = 'UK', count = 100):
-        '''count = number of twitter results, maximum is 100.
-        query = twitter search term'''
+        '''
+        Issue simple query using only a keyword.
         
+        Parameters
+        ==========
+        query = str: twitter search term 
+        count = int: number of twitter results, maximum is 100
+        
+        Returns
+        =======
+        self.resp = response from Twitter api
+        '''
         self.check_query(query, count)
         
         t = twitter.Twitter(auth=twitter.OAuth(self._token, 
@@ -94,9 +136,21 @@ class TwitterAPI:
         return self.resp
 
     def issue_geo_query(self, lat = 0, lon = 0, max_range = 1000, query = '', count = 100):
-        '''lat & lon == geographical centre of search
-        max_range == search range in kilometres from centre'''
-
+        '''
+        Issue geo query using a keyword, latitude and longitude with a maximum range.
+        
+        Parameters
+        ==========
+        lat = int: latitude
+        lon = int: longitude
+        max_range = int: max distance from lat/lon in km
+        query = str: twitter search term 
+        count = int: number of twitter results, maximum is 100
+        
+        Returns
+        =======
+        self.resp = response from Twitter api
+        '''
         self.check_query(query, count)
         
         t = twitter.Twitter(auth = twitter.OAuth(self._token, 
@@ -113,6 +167,17 @@ class TwitterAPI:
         return self.resp
 
     def parse_statuses(self, columns = None):
+        '''
+        Parses the JSON object into Excel format.
+        
+        Parameters
+        ==========
+        columns = list: specify columns to use else default will be used
+        
+        Returns
+        =======
+        results_df = pandas dataframe: parsed results
+        '''
         res = []
         if columns == None:
             columns = ['user', 'id', 'text', 'geo', 'coordinates', 'place']
@@ -134,6 +199,17 @@ class TwitterAPI:
         return self.results_df
 
     def get_metadata(self):
+        '''
+        Parses the metadata from the Twitter api response.
+        
+        Parameters
+        ==========
+        None
+        
+        Returns
+        =======
+        meta_string = str: a string containing the metadata from the issued query
+        '''
         meta_string = ''
         for each in self.resp['search_metadata']:
             meta_string += f"{each} = {self.resp['search_metadata'][each]}\n"
@@ -141,7 +217,17 @@ class TwitterAPI:
         return meta_string
 
     def output_results(self, filename = 'output'):
-        '''optional filename can be provided, do not include extension'''
+        '''
+        Ouput results from Twitter api query in an Excel workbook.
+        
+        Parameters
+        ==========
+        filename = str: output filename without extension
+        
+        Returns
+        =======
+        str: string message confirming function has been successful
+        '''
         if not filename.endswith('.xlsx'):
             filename = filename + '.xlsx'
         
